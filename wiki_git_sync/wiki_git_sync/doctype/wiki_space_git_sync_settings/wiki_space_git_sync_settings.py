@@ -16,6 +16,8 @@ from typing import TYPE_CHECKING
 import frappe
 from frappe.model.document import Document
 
+from wiki_git_sync.wiki_git_sync.utils import escape_title, unescape_title
+
 if TYPE_CHECKING:
 	from wiki.wiki.doctype.wiki_page.wiki_page import WikiPage
 	from wiki.wiki.doctype.wiki_space.wiki_space import WikiSpace
@@ -52,7 +54,7 @@ class WikiSpaceGitSyncSettings(Document):
 			"_pull_changes",
 			job_id=f"wiki_git_sync_pull_changes||{self.name}",
 			deduplicate=True,
-			now=True,
+			timeout=1800,
 		)
 		frappe.msgprint("Wiki pull job has been queued.<br/> Look into comments for updates.")
 
@@ -147,7 +149,6 @@ class WikiSpaceGitSyncSettings(Document):
 			group=group,
 			title=title,
 		)
-		print(referenced_file_names)
 		page = self.get_wiki_page_by_title(group, title, create_if_not_found=True)
 		if "route" in metadata:
 			page.route = f"{self.wiki_space_doc.route}/{metadata.get('route')}"
@@ -261,6 +262,7 @@ class WikiSpaceGitSyncSettings(Document):
 			"_export_docs",
 			job_id=f"wiki_git_sync_export_docs||{self.name}",
 			deduplicate=True,
+			timeout=1800,
 		)
 		frappe.msgprint("Wiki export job has been queued.<br/> Look into comments for updates.")
 
@@ -287,7 +289,7 @@ class WikiSpaceGitSyncSettings(Document):
 			page: WikiPage = frappe.get_doc("Wiki Page", item.wiki_page)
 
 			page_folder = docs_folder / item.parent_label
-			page_path = page_folder / f"{page.title}.MD"
+			page_path = page_folder / f"{escape_title(page.title)}.MD"
 
 			relative_route = page.route.lstrip(f"{wiki_space.route}/")
 
@@ -574,7 +576,7 @@ class WikiSpaceGitSyncSettings(Document):
 							file_names.append(fname)
 
 				entry = {
-					"title": title,
+					"title": unescape_title(title),
 					"file_names": file_names,
 				}
 				groups.setdefault(group, []).append(entry)
@@ -653,7 +655,7 @@ class WikiSpaceGitSyncSettings(Document):
 		if self.git_subfolder:
 			file_path = os.path.join(repo_path, self.git_subfolder)
 
-		file_path = os.path.join(file_path, group, f"{title}.MD")
+		file_path = os.path.join(file_path, group, f"{escape_title(title)}.MD")
 		with open(file_path) as f:
 			content = f.read()
 
