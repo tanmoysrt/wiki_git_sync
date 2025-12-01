@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import frappe
+import yaml
 from frappe.model.document import Document
 
 from wiki_git_sync.wiki_git_sync.utils import escape_title, unescape_title
@@ -341,6 +342,9 @@ class WikiSpaceGitSyncSettings(Document):
 
 			if source_path.exists():
 				shutil.copy2(source_path, destination_path)
+
+		# Export ordering of pages in YAML
+		self.export_ordering_of_pages_in_yml()
 
 		# Delete wiki branch if exists
 		subprocess.run(
@@ -695,6 +699,31 @@ class WikiSpaceGitSyncSettings(Document):
 		if content_start != -1:
 			content = content[content_start + 4 :].lstrip()
 		return metadata, content
+
+	def export_ordering_of_pages_in_yml(self) -> str:
+		data = []
+		groups_set = set()
+		groups = list()
+		for item in self.wiki_space_doc.wiki_sidebars:
+			if item.parent_label in groups_set:
+				continue
+
+			groups.append(item.parent_label)
+			groups_set.add(item.parent_label)
+
+		titles_in_group = {}
+		for item in self.wiki_space_doc.wiki_sidebars:
+			group = item.parent_label
+			title = frappe.get_value("Wiki Page", item.wiki_page, "title")
+			titles_in_group.setdefault(group, set()).add(title)
+
+		for group in groups:
+			data.append({group: list(titles_in_group.get(group, []))})
+
+		config = yaml.dump(data, sort_keys=False)
+		path = os.path.join(self.sync_folder(for_push=True), "order.yml")
+		with open(path, "w") as f:
+			f.write(config)
 
 	# Properties
 
