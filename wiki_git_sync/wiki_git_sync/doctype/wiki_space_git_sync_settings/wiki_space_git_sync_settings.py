@@ -122,6 +122,9 @@ class WikiSpaceGitSyncSettings(Document):
 				for doc_info in docs:
 					self.delete_wiki_page(group, doc_info["title"])
 
+			# Sync ordering of pages based on order.yml
+			self.sync_ordering_of_pages_based_on_yml()
+
 			self.git_last_sync_commit = self.get_latest_commit(git_path)
 			self.save()
 			self.add_comment("Comment", f"Wiki Pull Succeeded. <br/>Commit: {self.git_last_sync_commit}")
@@ -337,7 +340,7 @@ class WikiSpaceGitSyncSettings(Document):
 
 		for doc_name in file_docs:
 			doc = frappe.get_doc("File", doc_name)
-			source_path = bench_sites / doc.get_full_path()
+			source_path = bench_sites / doc.get_full_path()[len("./") :]
 			destination_path = files_folder / doc.file_name
 
 			if source_path.exists():
@@ -388,7 +391,7 @@ class WikiSpaceGitSyncSettings(Document):
 				"git",
 				"commit",
 				"-m",
-				f"docs: Wiki ({self.wiki_space}) Export Sync: {frappe.utils.now()}",
+				f"docs: Wiki ({self.wiki_space_doc.space_name}) Export Sync: {frappe.utils.now()}",
 				"--allow-empty",
 				'--author="Wiki Git Sync Bot <wiki-sync-bot@users.noreply.github.com>"',
 			],
@@ -700,6 +703,62 @@ class WikiSpaceGitSyncSettings(Document):
 			content = content[content_start + 4 :].lstrip()
 		return metadata, content
 
+	def sync_ordering_of_pages_based_on_yml(self) -> None:
+		path = os.path.join(self.sync_folder(for_push=False), "order.yml")
+		if not os.path.isfile(path):
+			return
+
+		with open(path) as f:
+			data = yaml.safe_load(f)
+
+		if not data:
+			return
+
+		# normalize YAML
+		groups = []
+		if isinstance(data, dict):
+			for g, t in data.items():
+				groups.append((g, t or []))
+		else:
+			for entry in data:
+				for g, t in entry.items():
+					groups.append((g, t or []))
+
+		wiki_space = self.wiki_space_doc
+		original = list(wiki_space.wiki_sidebars)
+		updated_items = []
+		processed = set()
+
+		for group, titles in groups:
+			for title in titles:
+				page = self.get_wiki_page_by_title(group, title, create_if_not_found=False)
+				if not page:
+					continue
+				item = next(
+					(i for i in original if i.parent_label == group and i.wiki_page == page.name),
+					None,
+				)
+				if item:
+					key = (item.parent_label, item.wiki_page)
+					if key not in processed:
+						updated_items.append(item)
+						processed.add(key)
+
+		for item in original:
+			key = (item.parent_label, item.wiki_page)
+			if key not in processed:
+				updated_items.append(item)
+				processed.add(key)
+
+		idx = 0
+		for i in updated_items:
+			i.idx = idx
+			idx += 1
+
+		wiki_space.wiki_sidebars = updated_items
+		wiki_space.save()
+		self.wiki_space_doc.reload()
+
 	def export_ordering_of_pages_in_yml(self) -> str:
 		data = []
 		groups_set = set()
@@ -715,10 +774,10 @@ class WikiSpaceGitSyncSettings(Document):
 		for item in self.wiki_space_doc.wiki_sidebars:
 			group = item.parent_label
 			title = frappe.get_value("Wiki Page", item.wiki_page, "title")
-			titles_in_group.setdefault(group, set()).add(title)
+			titles_in_group.setdefault(group, list()).append(title)
 
 		for group in groups:
-			data.append({group: list(titles_in_group.get(group, []))})
+			data.append({group: titles_in_group.get(group, [])})
 
 		config = yaml.dump(data, sort_keys=False)
 		path = os.path.join(self.sync_folder(for_push=True), "order.yml")
