@@ -1,0 +1,126 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-01 01:10:42.878321",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "column_break_ylqx",
+  "wiki_space",
+  "column_break_srrr",
+  "git_subfolder",
+  "section_break_mfbk",
+  "git_url",
+  "git_upstream_branch",
+  "git_export_branch",
+  "column_break_fadr",
+  "git_username",
+  "git_password",
+  "git_last_sync_commit"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "wiki_space",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Wiki Space",
+   "options": "Wiki Space",
+   "reqd": 1
+  },
+  {
+   "fieldname": "git_url",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Git URL",
+   "reqd": 1
+  },
+  {
+   "fieldname": "git_username",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Git Username",
+   "reqd": 1
+  },
+  {
+   "fieldname": "git_password",
+   "fieldtype": "Password",
+   "in_list_view": 1,
+   "label": "Git Password",
+   "reqd": 1
+  },
+  {
+   "fieldname": "git_upstream_branch",
+   "fieldtype": "Data",
+   "label": "Git Upstream Branch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "git_subfolder",
+   "fieldtype": "Data",
+   "label": "Git Subfolder",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_ylqx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_srrr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_mfbk",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_fadr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "git_last_sync_commit",
+   "fieldtype": "Data",
+   "label": "Git Last Sync Commit"
+  },
+  {
+   "default": "wiki-sync",
+   "fieldname": "git_export_branch",
+   "fieldtype": "Data",
+   "label": "Git Export Branch",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-01 02:29:35.789826",
+ "modified_by": "Administrator",
+ "module": "Wiki Git Sync",
+ "name": "Wiki Space Git Sync Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

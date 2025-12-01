@@ -143,23 +143,13 @@ app_license = "mit"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"wiki_git_sync.tasks.all"
-# 	],
-# 	"daily": [
-# 		"wiki_git_sync.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"wiki_git_sync.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"wiki_git_sync.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"wiki_git_sync.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"cron": {
+		"*/5 * * * *": [
+			"wiki_git_sync.wiki_git_sync.doctype.wiki_space_git_sync_settings.wiki_space_git_sync_settings.pull_wiki_changes"
+		]
+	}
+}
 
 # Testing
 # -------
@@ -239,7 +229,7 @@ app_license = "mit"
 # ]
 
 # Automatically update python controller files with type annotations for this app.
-# export_python_type_annotations = True
+export_python_type_annotations = True
 
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
@@ -249,4 +239,3 @@ app_license = "mit"
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
-
