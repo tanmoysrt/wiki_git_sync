@@ -135,7 +135,9 @@ class WikiSpaceGitSyncSettings(Document):
 
 		for item in wiki_space.wiki_sidebars:
 			page: WikiPage = frappe.get_doc("Wiki Page", item.wiki_page)
-			updated_content = pattern.sub(lambda m: file_replace_map[m.group(0)], (page.content or ""))
+			updated_content = pattern.sub(
+				lambda m: file_replace_map.get(m.group(0), ""), (page.content or "")
+			)
 
 			if updated_content != page.content:
 				page.content = updated_content
@@ -237,10 +239,14 @@ class WikiSpaceGitSyncSettings(Document):
 				"doctype": "Wiki Page",
 				"title": title,
 				"content": "--",
-				"route": f"{wiki_space.route}/{title.replace(' ', '-').lower()}",
+				"route": f"{wiki_space.route}/{group.replace(' ', '-').lower()}_{title.replace(' ', '-').lower()}",  # this name is temporary
 			}
 		)
-		page.insert(ignore_permissions=True)
+
+		try:
+			page.insert(ignore_permissions=True)
+		except frappe.UniqueValidationError as e:
+			raise Exception(f"Wiki Page with title '{title}' from group '{group}' already exists.") from e
 
 		# Add to Wiki Space Sidebar
 		wiki_space.append(
@@ -251,6 +257,7 @@ class WikiSpaceGitSyncSettings(Document):
 			},
 		)
 		wiki_space.save()
+		self.wiki_space_doc.reload()
 
 		return page
 
