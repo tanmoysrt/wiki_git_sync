@@ -23,8 +23,8 @@ if TYPE_CHECKING:
 	from wiki.wiki.doctype.wiki_page.wiki_page import WikiPage
 	from wiki.wiki.doctype.wiki_space.wiki_space import WikiSpace
 
-FILE_REGEX = re.compile(r"/files/([\w\-\/\.%]+)")
-RELATIVE_FILE_REGEX = re.compile(r"\.\./files/([\w\-\/\.%]+)")
+FILE_REGEX = re.compile(r"/files/(.+?)(?=\s*[\"\')])")
+RELATIVE_FILE_REGEX = re.compile(r"\.\./files/(.+?)(?=\s*[\"\')])")
 
 
 class WikiSpaceGitSyncSettings(Document):
