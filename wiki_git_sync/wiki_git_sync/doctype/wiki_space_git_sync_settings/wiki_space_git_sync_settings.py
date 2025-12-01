@@ -36,6 +36,7 @@ class WikiSpaceGitSyncSettings(Document):
 	if TYPE_CHECKING:
 		from frappe.types import DF
 
+		allow_guest_by_default: DF.Check
 		enabled: DF.Check
 		git_export_branch: DF.Data
 		git_last_sync_commit: DF.Data | None
@@ -44,6 +45,7 @@ class WikiSpaceGitSyncSettings(Document):
 		git_upstream_branch: DF.Data
 		git_url: DF.Data
 		git_username: DF.Data
+		publish_page_by_default: DF.Check
 		wiki_space: DF.Link
 	# end: auto-generated types
 
@@ -166,8 +168,8 @@ class WikiSpaceGitSyncSettings(Document):
 				content = content.replace(f"../files/{file_name}", file_url)
 
 		page.content = content
-		page.allow_guest = bool(int(metadata.get("allow_guest", "0")))
-		page.published = bool(int(metadata.get("published", "0")))
+		page.allow_guest = bool(int(metadata.get("allow_guest", self.allow_guest_by_default)))
+		page.published = bool(int(metadata.get("published", self.publish_page_by_default)))
 		page.save()
 
 	def delete_wiki_page(self, group: str, title: str) -> None:

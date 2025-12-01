@@ -14,6 +14,8 @@
   "git_url",
   "git_upstream_branch",
   "git_export_branch",
+  "allow_guest_by_default",
+  "publish_page_by_default",
   "column_break_fadr",
   "git_username",
   "git_password",
@@ -24,6 +26,7 @@
    "default": "0",
    "fieldname": "enabled",
    "fieldtype": "Check",
+   "in_list_view": 1,
    "label": "Enabled"
   },
   {
@@ -44,26 +47,26 @@
   {
    "fieldname": "git_username",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "Git Username",
    "reqd": 1
   },
   {
    "fieldname": "git_password",
    "fieldtype": "Password",
-   "in_list_view": 1,
    "label": "Git Password",
    "reqd": 1
   },
   {
    "fieldname": "git_upstream_branch",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Git Upstream Branch",
    "reqd": 1
   },
   {
    "fieldname": "git_subfolder",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Git Subfolder",
    "reqd": 1
   },
@@ -94,12 +97,24 @@
    "fieldtype": "Data",
    "label": "Git Export Branch",
    "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_guest_by_default",
+   "fieldtype": "Check",
+   "label": "Allow Guest By Default"
+  },
+  {
+   "default": "0",
+   "fieldname": "publish_page_by_default",
+   "fieldtype": "Check",
+   "label": "Publish Page By Default"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-01 02:29:35.789826",
+ "modified": "2025-12-01 15:10:11.530959",
  "modified_by": "Administrator",
  "module": "Wiki Git Sync",
  "name": "Wiki Space Git Sync Settings",
