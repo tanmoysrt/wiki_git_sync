@@ -358,6 +358,19 @@ class WikiSpaceGitSyncSettings(Document):
 			check=True,
 		)
 
+		# Set user config
+		subprocess.run(
+			["git", "config", "user.name", "Wiki Git Sync Bot"],
+			cwd=git_path,
+			check=True,
+		)
+
+		subprocess.run(
+			["git", "config", "user.email", "wiki-sync-bot@users.noreply.github.com"],
+			cwd=git_path,
+			check=True,
+		)
+
 		# Commit changes
 		subprocess.run(
 			[
