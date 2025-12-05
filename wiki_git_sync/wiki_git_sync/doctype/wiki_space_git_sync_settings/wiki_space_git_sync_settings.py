@@ -304,7 +304,7 @@ class WikiSpaceGitSyncSettings(Document):
 			page_folder = docs_folder / item.parent_label
 			page_path = page_folder / f"{escape_title(page.title)}.MD"
 
-			relative_route = page.route[f"{wiki_space.route}/" :]
+			relative_route = page.route[len(f"{wiki_space.route}/") :]
 
 			frontmatter = (
 				f"---\n"
