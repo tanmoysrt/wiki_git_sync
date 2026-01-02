@@ -1,8 +1,7 @@
-# Copyright (c) 2025, Tanmoy and contributors
-# For license information, please see license.txt
-
 from __future__ import annotations
 
+# Copyright (c) 2025, Tanmoy and contributors
+# For license information, please see license.txt
 import hashlib
 import os
 import re
@@ -109,6 +108,11 @@ class WikiSpaceGitSyncSettings(Document):
 
 			docs_changes = changes.get("docs", {})
 
+			# Remove deleted docs changes first to free up routes
+			for group, docs in docs_changes.get("deleted", {}).items():
+				for doc_info in docs:
+					self.delete_wiki_page(group, doc_info["title"])
+
 			# Update modified docs changes
 			for group, docs in docs_changes.get("modified", {}).items():
 				for doc_info in docs:
@@ -118,11 +122,6 @@ class WikiSpaceGitSyncSettings(Document):
 			for group, docs in docs_changes.get("added", {}).items():
 				for doc_info in docs:
 					self.update_wiki_page(group, doc_info["title"], git_path, doc_info["file_names"])
-
-			# Remove deleted docs changes
-			for group, docs in docs_changes.get("deleted", {}).items():
-				for doc_info in docs:
-					self.delete_wiki_page(group, doc_info["title"])
 
 			# Sync ordering of pages based on order.yml
 			self.sync_ordering_of_pages_based_on_yml()
